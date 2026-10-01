@@ -20,4 +20,10 @@ func main() {
 
 	fmt.Print("Enter time(t): ")
 	fmt.Scan(&t)
+
+	fmt.Print("Result: V = %.2f\n", V)
+}
+
+func calculate() {
+	V = V0 + (a * t)
 }
