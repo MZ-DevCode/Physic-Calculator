@@ -20,37 +20,39 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 	formulas := []Formula{
-		Name:	"Final Velocity",
-		Find:	"V",
-		Needed: []string{"V0", "a", "t"},
-		Compute: func(args map[string]float64){
-			V0 := args["V0"]
-			a := args["a"]
-			t := args["t"]
-			result := V0 + (a * t)
-			fmt.Printf("Result: V = %.2f\n", result)
-		}
+		{
+			Name:   "Final Velocity",
+			Find:   "V",
+			Needed: []string{"V0", "a", "t"},
+			Compute: func(args map[string]float64) {
+				V0 := args["V0"]
+				a := args["a"]
+				t := args["t"]
+				result := V0 + (a * t)
+				fmt.Printf("Result: V = %.2f\n", result)
+			},
+		},
 	}
 
-	fmt.Print("What needs to be found?")
+	fmt.Print("What needs to be found: ")
 	input, _ := reader.ReadString('\n')
 	target := strings.TrimSpace(input)
 
 	var foundFormula *Formula
-	for i := range formulas{
-		if formulas[i].Find == target{
+	for i := range formulas {
+		if formulas[i].Find == target {
 			foundFormula = &formulas[i]
 			break
 		}
 	}
 
 	if foundFormula == nil {
-			fmt.Println("Formula not found")
-			return
-		}
+		fmt.Println("Formula not found")
+		return
+	}
 
 	args := make(map[string]float64)
-	for _, i := range foundFormula.Needed{
+	for _, i := range foundFormula.Needed {
 		fmt.Printf("Enter %s: ", i)
 		args[i] = readFloat(reader)
 	}
