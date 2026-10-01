@@ -9,16 +9,28 @@ import (
 )
 
 type Formula struct {
-	Name    string
-	Find    string
-	Needed  []string
-	Compute func(args map[string]float64)
+	Name    string                        //name
+	Find    string                        //need find value
+	Needed  []string                      //needed for formula
+	Compute func(args map[string]float64) //math
 }
 
 func main() {
 	fmt.Println("Calculator of kinematics")
 
 	reader := bufio.NewReader(os.Stdin)
+	formulas := []Formula{
+		Name:	"Final Velocity",
+		Find:	"V",
+		Needed: []string{"V0", "a", "t"},
+		Compute: func(args map[string]float64){
+			V0 := args["V0"]
+			a := args["a"]
+			t := args["t"]
+			result := V0 + (a * t)
+			fmt.Printf("Result: V = %.2f\n", result)
+		}
+	}
 
 	fmt.Print("What needs to be found?")
 	input, _ := reader.ReadString('\n')
