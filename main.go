@@ -8,34 +8,23 @@ import (
 	"strings"
 )
 
-var (
-	V  float64 = 0.0
-	V0 float64 = 0.0
-	a  float64 = 0.0
-	t  float64 = 0.0
-)
+type Formula struct {
+	Name    string
+	Find    string
+	Needed  []string
+	Compute func(args map[string]float64)
+}
 
 func main() {
 	fmt.Println("Calculator of kinematics")
 
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Enter the initial velocity (V0): ")
-	V0 = readFloat(reader)
-
-	fmt.Print("Enter acceleration (a): ")
-	a = readFloat(reader)
-
-	fmt.Print("Enter time (t): ")
-	t = readFloat(reader)
-
-	calculateKinematics()
-
-	fmt.Printf("Result: V = %.2f\n", V)
-}
-
-func calculateKinematics() {
-	V = V0 + (a * t)
+	fmt.Print("What needs to be found?")
+	input, _ := reader.ReadString('\n')
+	target := strings.TrimSpace(input)
+	fmt.Print("Enter the known data: ")
+	readFloat(reader)
 }
 
 func readFloat(reader *bufio.Reader) float64 {
