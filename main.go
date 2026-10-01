@@ -3,11 +3,10 @@ package main
 import "fmt"
 
 var (
-	V  = 0
-	V0 = 0
-	a  = 0
-	t  = 0
-	g  = 10.0
+	V  float64 = 0.0
+	V0 float64 = 0.0
+	a  float64 = 0.0
+	t  float64 = 0.0
 )
 
 func main() {
