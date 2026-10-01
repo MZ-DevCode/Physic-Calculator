@@ -35,8 +35,27 @@ func main() {
 	fmt.Print("What needs to be found?")
 	input, _ := reader.ReadString('\n')
 	target := strings.TrimSpace(input)
-	fmt.Print("Enter the known data: ")
-	readFloat(reader)
+
+	var foundFormula *Formula
+	for i := range formulas{
+		if formulas[i].Find == target{
+			foundFormula = &formulas[i]
+			break
+		}
+	}
+
+	if foundFormula == nil {
+			fmt.Println("Formula not found")
+			return
+		}
+
+	args := make(map[string]float64)
+	for _, i := range foundFormula.Needed{
+		fmt.Printf("Enter %s: ", i)
+		args[i] = readFloat(reader)
+	}
+
+	foundFormula.Compute(args)
 }
 
 func readFloat(reader *bufio.Reader) float64 {
