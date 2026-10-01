@@ -9,10 +9,11 @@ import (
 )
 
 type Formula struct {
-	Name    string                        //name
-	Find    string                        //need find value
-	Needed  []string                      //needed for formula
-	Compute func(args map[string]float64) //math
+	Name     string                        //name
+	Equation string                        //equation
+	Find     string                        //need find value
+	Needed   []string                      //needed for formula
+	Compute  func(args map[string]float64) //math
 }
 
 func main() {
@@ -20,23 +21,33 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 
+	units := map[string]string{
+		"V":  "m/s",
+		"V0": "m/s",
+		"a":  "m/s^2",
+		"t":  "s",
+		"S":  "m",
+	}
+
 	formulas := []Formula{
 		{
-			Name:   "Final Velocity",
-			Find:   "V",
-			Needed: []string{"V0", "a", "t"},
+			Name:     "Final Velocity",
+			Equation: "V = V0 + a * t",
+			Find:     "V",
+			Needed:   []string{"V0", "a", "t"},
 			Compute: func(args map[string]float64) {
 				v0 := args["V0"]
 				a := args["a"]
 				t := args["t"]
 				result := v0 + (a * t)
-				fmt.Printf("Result: V = %.2f\n", result)
+				fmt.Printf("Result: V = %.2f %s\n", result, units["V"])
 			},
 		},
 		{
-			Name:   "Final Velocity from Distance and Time",
-			Find:   "V",
-			Needed: []string{"S", "t"},
+			Name:     "Final Velocity from Distance and Time",
+			Equation: "V = S / t",
+			Find:     "V",
+			Needed:   []string{"S", "t"},
 			Compute: func(args map[string]float64) {
 				s := args["S"]
 				t := args["t"]
@@ -45,13 +56,14 @@ func main() {
 					return
 				}
 				result := s / t
-				fmt.Printf("Result: V = %.2f\n", result)
+				fmt.Printf("Result: V = %.2f %s\n", result, units["V"])
 			},
 		},
 		{
-			Name:   "Acceleration",
-			Find:   "a",
-			Needed: []string{"V", "V0", "t"},
+			Name:     "Acceleration",
+			Equation: "a = (V - V0) / t",
+			Find:     "a",
+			Needed:   []string{"V", "V0", "t"},
 			Compute: func(args map[string]float64) {
 				v := args["V"]
 				v0 := args["V0"]
@@ -61,24 +73,26 @@ func main() {
 					return
 				}
 				result := (v - v0) / t
-				fmt.Printf("Result: a = %.2f\n", result)
+				fmt.Printf("Result: a = %.2f %s\n", result, units["a"])
 			},
 		},
 		{
-			Name:   "Distance",
-			Find:   "S",
-			Needed: []string{"V", "t"},
+			Name:     "Distance",
+			Equation: "S = V * t",
+			Find:     "S",
+			Needed:   []string{"V", "t"},
 			Compute: func(args map[string]float64) {
 				v := args["V"]
 				t := args["t"]
 				result := v * t
-				fmt.Printf("Result: S = %.2f\n", result)
+				fmt.Printf("Result: S = %.2f %s\n", result, units["S"])
 			},
 		},
 		{
-			Name:   "Distance from Velocities and Acceleration",
-			Find:   "S",
-			Needed: []string{"V", "V0", "a"},
+			Name:     "Distance from Velocities and Acceleration",
+			Equation: "S = (V^2 - V0^2) / (2 * a)",
+			Find:     "S",
+			Needed:   []string{"V", "V0", "a"},
 			Compute: func(args map[string]float64) {
 				v := args["V"]
 				v0 := args["V0"]
@@ -88,13 +102,14 @@ func main() {
 					return
 				}
 				result := ((v * v) - (v0 * v0)) / (2 * a)
-				fmt.Printf("Result: S = %.2f\n", result)
+				fmt.Printf("Result: S = %.2f %s\n", result, units["S"])
 			},
 		},
 		{
-			Name:   "Time",
-			Find:   "t",
-			Needed: []string{"S", "V"},
+			Name:     "Time",
+			Equation: "t = S / V",
+			Find:     "t",
+			Needed:   []string{"S", "V"},
 			Compute: func(args map[string]float64) {
 				s := args["S"]
 				v := args["V"]
@@ -103,19 +118,20 @@ func main() {
 					return
 				}
 				result := s / v
-				fmt.Printf("Result: t = %.2f\n", result)
+				fmt.Printf("Result: t = %.2f %s\n", result, units["t"])
 			},
 		},
 		{
-			Name:   "Initial Velocity",
-			Find:   "V0",
-			Needed: []string{"V", "a", "t"},
+			Name:     "Initial Velocity",
+			Equation: "V0 = V - a * t",
+			Find:     "V0",
+			Needed:   []string{"V", "a", "t"},
 			Compute: func(args map[string]float64) {
 				v := args["V"]
 				a := args["a"]
 				t := args["t"]
 				result := v - (a * t)
-				fmt.Printf("Result: V0 = %.2f\n", result)
+				fmt.Printf("Result: V0 = %.2f %s\n", result, units["V0"])
 			},
 		},
 	}
@@ -137,11 +153,15 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Using formula: %s\n", foundFormula.Name)
+	fmt.Printf("Using formula: %s (%s)\n", foundFormula.Name, foundFormula.Equation)
 
 	args := make(map[string]float64)
 	for _, param := range foundFormula.Needed {
-		fmt.Printf("Enter %s: ", param)
+		if unit, exists := units[param]; exists {
+			fmt.Printf("Enter %s (%s): ", param, unit)
+		} else {
+			fmt.Printf("Enter %s: ", param)
+		}
 		args[param] = readFloat(reader)
 	}
 
