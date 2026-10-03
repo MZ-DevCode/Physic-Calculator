@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -17,7 +18,7 @@ type Formula struct {
 }
 
 func main() {
-	fmt.Println("Calculator of kinematics")
+	fmt.Println("Calculator of kinematics & Free Fall")
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -27,6 +28,8 @@ func main() {
 		"a":  "m/s^2",
 		"t":  "s",
 		"S":  "m",
+		"h":  "m",
+		"g":  "m/s^2",
 	}
 
 	formulas := []Formula{
@@ -134,9 +137,49 @@ func main() {
 				fmt.Printf("Result: V0 = %.2f %s\n", result, units["V0"])
 			},
 		},
+		{
+			Name:     "Free Fall Height (from time)",
+			Equation: "h = (g * t^2) / 2",
+			Find:     "h",
+			Needed:   []string{"g", "t"},
+			Compute: func(args map[string]float64) {
+				g := args["g"]
+				t := args["t"]
+				result := (g * (t * t)) / 2
+				fmt.Printf("Result: h = %.2f %s\n", result, units["h"])
+			},
+		},
+		{
+			Name:     "Free Fall Time (from height)",
+			Equation: "t = sqrt(2 * h / g)",
+			Find:     "t_fall",
+			Needed:   []string{"h", "g"},
+			Compute: func(args map[string]float64) {
+				h := args["h"]
+				g := args["g"]
+				if g == 0 {
+					fmt.Println("Error: gravity cannot be zero!")
+					return
+				}
+				result := math.Sqrt((2 * h) / g)
+				fmt.Printf("Result: t = %.2f %s\n", result, units["t"])
+			},
+		},
+		{
+			Name:     "Free Fall Final Velocity",
+			Equation: "V = g * t",
+			Find:     "V_ff",
+			Needed:   []string{"g", "t"},
+			Compute: func(args map[string]float64) {
+				g := args["g"]
+				t := args["t"]
+				result := g * t
+				fmt.Printf("Result: V = %.2f %s\n", result, units["V"])
+			},
+		},
 	}
 
-	fmt.Print("What needs to be found? (V, a, S, t, V0): ")
+	fmt.Print("What needs to be found? (V, a, S, t, V0, h, t_fall, V_ff): ")
 	input, _ := reader.ReadString('\n')
 	target := strings.TrimSpace(input)
 
